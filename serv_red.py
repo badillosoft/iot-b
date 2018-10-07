@@ -31,17 +31,20 @@ neighbors = ["accumbent-emu-7149", "magmatic-kudo-8520"]
 
 @app.route("/message/<id_m>/<id_n>/<cmd>")
 def message(id_m, id_n, cmd):
+	print("recibiendo {} {} {}".format(id_m, id_n, cmd))
 	# Para cada id_x (el id del mensaje en el stack)
 	for id_x in stack:
 		# Si el mensaje que recibe ya esta en el stack finaliza
 		if id_m == id_x:
+			print("nothing")
 			return "done [nothing]"
 	# Si el id del nodo es igual al id de este nodo
 	if id_n == id:
 		# Convierto el comando a / (ej. led-3-on => led/3/on)
 		cmd = cmd.replace("-", "/")
 		# Ejecuto el comando
-		os.system("curl https://{}.dataplicity.io/{}", id, cmd)
+		os.system("curl https://{}.dataplicity.io/{}".format(id, cmd))
+		print("exec")
 		return "done [self]"
 	# Si el stack supera el numero maximo
 	if len(stack) > MAX_STACK:
@@ -52,6 +55,7 @@ def message(id_m, id_n, cmd):
 	# Replicar el mensaje a los vecinos
 	for id_y in neighbors:
 		os.system("curl https://{}.dataplicity.io/message/{}/{}/{}".format(id_y, id_m, id_n, cmd))
+		print("transmitiendo {}".format(id_y))
 	return "done [replicate]"
 	
 app.run(port = 80)
